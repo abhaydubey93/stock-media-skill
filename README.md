@@ -178,5 +178,11 @@ The mock honours `MOCK_CDN_BASE` for its asset URLs.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE). The plugin code is MIT; the media it retrieves
-is covered by the [Pixabay Content License](https://pixabay.com/service/license-summary/).
+The plugin code is MIT — see [LICENSE](LICENSE).
+
+The media it retrieves is **not** covered by that licence. Everything the API
+returns is governed by the
+[Pixabay Content License](https://pixabay.com/service/license-summary/):
+free for commercial and non-commercial use, modification allowed, attribution
+optional, standalone redistribution of unmodified assets prohibited, and
+permanent hotlinking of images not permitted.
