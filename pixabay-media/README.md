@@ -53,7 +53,7 @@ Measurements and the full field list are in
 ### Install
 
 ```
-/plugin install pixabay-media --marketplace <owner>/<repo>
+/plugin install pixabay-media --marketplace abhaydubey93/stock-media-skill
 ```
 
 From a local checkout, add the marketplace and install from it:

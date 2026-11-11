@@ -44,13 +44,13 @@ Full measurements: [`pixabay-media/references/cdn-renditions.md`](pixabay-media/
 ### From a marketplace
 
 ```
-/plugin install pixabay-media --marketplace <owner>/<repo>
+/plugin install pixabay-media --marketplace abhaydubey93/stock-media-skill
 ```
 
 ### From a clone
 
 ```bash
-git clone https://github.com/<owner>/stock-media-skill.git
+git clone https://github.com/abhaydubey93/stock-media-skill.git
 cd stock-media-skill
 claude plugin marketplace add .
 claude plugin install pixabay-media@stock-media
