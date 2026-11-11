@@ -1,0 +1,30 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Claude Code local state
+.claude/settings.local.json
+.claude/settings.json
+.mcp.json.local
+
+# Local tooling data
+.remember/
+*.log
+hs_err_pid*.log
+dump.rdb
+
+# Caches
+.cache/
+tmp/
+coverage/
+.DS_Store
+Thumbs.db
+
+# Env / secrets — never commit API keys
+.env
+.env.*
+!.env.example
+*.key
+*.pem

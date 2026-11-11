@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "pixabay-media",
+  "displayName": "Pixabay Media",
+  "version": "1.0.0",
+  "description": "Search, download, and license royalty-free stock photos, illustrations, vectors, and stock footage from Pixabay. Use whenever someone needs a stock image, stock video, B-roll, background photo, or stock media for a site, deck, video, or social post.",
+  "author": {
+    "name": "Abhay Dubey",
+    "url": "https://github.com/abhaydubey93"
+  },
+  "homepage": "https://github.com/abhaydubey93/stock-media-skill",
+  "repository": "https://github.com/abhaydubey93/stock-media-skill",
+  "icon": "./.claude-plugin/icon.png",
+  "license": "MIT",
+  "keywords": [
+    "pixabay",
+    "stock-photos",
+    "stock-video",
+    "stock-media",
+    "royalty-free",
+    "images",
+    "video",
+    "b-roll",
+    "backgrounds",
+    "media-search"
+  ],
+  "userConfig": {
+    "pixabay_api_key": {
+      "type": "string",
+      "title": "Pixabay API key",
+      "description": "Your Pixabay API key (https://pixabay.com/api/docs/ -> 'Get API Key'). Stored in secure credential storage, never in settings.json. Needed for every image and video search.",
+      "sensitive": true
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "skill_name": "pixabay-media",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need a stock photo for the hero section of my SaaS landing page (it's a project management tool called \"Tempo\"). It should look professional and calm - maybe something with mountains or a clean abstract workspace. Can you find me a few options? The site is 1440px wide.",
+      "expected_output": "Uses the pixabay search to find images. Applies a horizontal orientation filter (and possibly min_width 1920) given the 1440px hero. Returns a short shortlist of 2-5 candidates with id, description, author, and pageURL, and offers to download at a suitable rendition. Does not fabricate URLs or invent image ids.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Find me a short looping background video of autumn leaves falling for my landing page background. Needs to be lightweight - the page loads on mobile.",
+      "expected_output": "Searches stock video, checks the duration of results, and recommends an appropriate rendition (small or medium rather than large/4K) given the mobile/lightweight requirement. Reports duration in seconds and notes that the clip needs to loop. Flags the type (film vs animation) if relevant.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I found this photo on Pixabay and want to use it on my company's marketing page. https://pixabay.com/photos/some-nice-photo-123456/ - is that ok? Do I need to put their name on it? We're selling it as part of a paid course so I want to be careful. Also I'm training a model on stock imagery - can this one be used for that?",
+      "expected_output": "Explains the Pixabay Content License accurately: free for commercial use, modification allowed, attribution optional but appreciated. Explains that standalone redistribution is prohibited and that using it inside a paid course is fine as long as it isn't resold standalone. Notes trademark/person/logo caveats. For the AI/ML training question, checks the per-asset `noAiTraining` flag (false means not blocked, true means blocked) rather than claiming the licence summary settles it, and reports what the flag actually says.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Download image 2297204 at the 960px size into ./assets. I need it to be exactly 960 wide for a blog header.",
+      "expected_output": "Calls download_image with size web_960 and the correct destination. Reports the resolved_url and that the file was saved. Correctly handles the fact that Pixabay's _960 token does not exist and the working file is _960_720. Writes the .json sidecar. Does not hotlink a pixabay.com URL.",
+      "files": []
+    }
+  ]
+}

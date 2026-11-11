@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "pixabay": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/pixabay-mcp.mjs"],
+      "env": {
+        "PIXABAY_API_KEY": "${user_config.pixabay_api_key}"
+      }
+    }
+  }
+}

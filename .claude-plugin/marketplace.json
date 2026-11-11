@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "stock-media",
+  "owner": {
+    "name": "Abhay Dubey",
+    "url": "https://github.com/abhaydubey93"
+  },
+  "description": "Plugins for sourcing royalty-free stock images and video",
+  "plugins": [
+    {
+      "name": "pixabay-media",
+      "displayName": "Pixabay Media",
+      "source": "./pixabay-media",
+      "description": "Search, download, and license royalty-free stock photos, illustrations, vectors, and stock footage from Pixabay.",
+      "author": {
+        "name": "Abhay Dubey",
+        "url": "https://github.com/abhaydubey93"
+      },
+      "homepage": "https://github.com/abhaydubey93/stock-media-skill",
+      "repository": "https://github.com/abhaydubey93/stock-media-skill",
+      "license": "MIT",
+      "category": "Media",
+      "keywords": [
+        "pixabay",
+        "stock-photos",
+        "stock-video",
+        "royalty-free",
+        "media-search"
+      ],
+      "tags": [
+        "images",
+        "video",
+        "b-roll",
+        "backgrounds",
+        "licensing"
+      ]
+    }
+  ]
+}
