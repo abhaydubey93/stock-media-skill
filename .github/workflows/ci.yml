@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate plugin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check script syntax
+        run: |
+          for f in pixabay-media/scripts/*.mjs; do
+            node --check "$f"
+          done
+
+      - name: Validate plugin manifest
+        run: claude plugin validate ./pixabay-media --strict
+
+      - name: Validate marketplace manifest
+        run: claude plugin validate ./.claude-plugin/marketplace.json
+
+  smoke:
+    name: Smoke test against mock API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Start mock Pixabay API
+        run: |
+          node pixabay-media/scripts/mock-pixabay.mjs 8731 &
+          npx --yes wait-on http://127.0.0.1:8731 || sleep 3
+
+      - name: Search images
+        env:
+          PIXABAY_API_BASE: http://127.0.0.1:8731
+          PIXABAY_API_KEY: TESTKEY
+          CLAUDE_PLUGIN_DATA: ${{ runner.temp }}/pixabay-cache
+        run: |
+          node pixabay-media/scripts/pixabay.mjs search-images blossom --per-page 3 --json \
+            | tee out.json \
+            | grep -q '"id": 195893'
+          rm -f out.json
+
+      - name: Download an image and write its sidecar
+        env:
+          PIXABAY_API_BASE: http://127.0.0.1:8731
+          PIXABAY_API_KEY: TESTKEY
+          CLAUDE_PLUGIN_DATA: ${{ runner.temp }}/pixabay-cache
+        run: |
+          node pixabay-media/scripts/pixabay.mjs download-image 195893 \
+            --dest "${{ runner.temp }}/assets" --size large
+          test -f "${{ runner.temp }}/assets/"*.jpg
+          test -f "${{ runner.temp }}/assets/"*.jpg.json
+
+      - name: Rejects a bad API key
+        env:
+          PIXABAY_API_BASE: http://127.0.0.1:8731
+          PIXABAY_API_KEY: INVALID
+          CLAUDE_PLUGIN_DATA: ${{ runner.temp }}/pixabay-cache
+        run: |
+          if node pixabay-media/scripts/pixabay.mjs search-images blossom --per-page 3 2>&1 \
+              | grep -q "rejected the API key"; then
+            echo "correctly rejected the bad key"
+          else
+            echo "expected the bad key to be rejected" >&2
+            exit 1
+          fi
