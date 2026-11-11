@@ -17,6 +17,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install Claude Code
+        run: curl -fsSL https://claude.ai/install.sh | bash
+
       - name: Check script syntax
         run: |
           for f in pixabay-media/scripts/*.mjs; do
@@ -39,43 +42,52 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Start mock Pixabay API
+      # One step: the mock server is backgrounded here and torn down at the
+      # end, so it never outlives the step that needs it.
+      #
+      # Assertions write to a file rather than piping into grep. A pipe into
+      # `grep -q` closes the pipe early, which SIGPIPEs the writer and makes
+      # `set -o pipefail` report failure for the wrong reason.
+      - name: Search, download, and reject a bad key
+        env:
+          PIXABAY_API_BASE: http://127.0.0.1:8731
+          CLAUDE_PLUGIN_DATA: ${{ runner.temp }}/pixabay-cache
         run: |
+          set -euo pipefail
           node pixabay-media/scripts/mock-pixabay.mjs 8731 &
-          npx --yes wait-on http://127.0.0.1:8731 || sleep 3
+          MOCK_PID=$!
+          trap 'kill $MOCK_PID 2>/dev/null || true' EXIT
 
-      - name: Search images
-        env:
-          PIXABAY_API_BASE: http://127.0.0.1:8731
-          PIXABAY_API_KEY: TESTKEY
-          CLAUDE_PLUGIN_DATA: ${{ runner.temp }}/pixabay-cache
-        run: |
-          node pixabay-media/scripts/pixabay.mjs search-images blossom --per-page 3 --json \
-            | tee out.json \
-            | grep -q '"id": 195893'
-          rm -f out.json
+          for i in $(seq 1 30); do
+            if curl -sf "http://127.0.0.1:8731/?key=TESTKEY" > /dev/null; then break; fi
+            if [ "$i" = "30" ]; then echo "mock API did not come up" >&2; exit 1; fi
+            sleep 1
+          done
 
-      - name: Download an image and write its sidecar
-        env:
-          PIXABAY_API_BASE: http://127.0.0.1:8731
-          PIXABAY_API_KEY: TESTKEY
-          CLAUDE_PLUGIN_DATA: ${{ runner.temp }}/pixabay-cache
-        run: |
-          node pixabay-media/scripts/pixabay.mjs download-image 195893 \
-            --dest "${{ runner.temp }}/assets" --size large
+          echo "--- search images ---"
+          PIXABAY_API_KEY=TESTKEY \
+            node pixabay-media/scripts/pixabay.mjs search-images blossom --per-page 3 --json \
+            > out.json
+          grep -q '"id": 195893' out.json
+
+          echo "--- download an image and write its sidecar ---"
+          PIXABAY_API_KEY=TESTKEY \
+            node pixabay-media/scripts/pixabay.mjs download-image 195893 \
+              --dest "${{ runner.temp }}/assets" --size large
           test -f "${{ runner.temp }}/assets/"*.jpg
           test -f "${{ runner.temp }}/assets/"*.jpg.json
 
-      - name: Rejects a bad API key
-        env:
-          PIXABAY_API_BASE: http://127.0.0.1:8731
-          PIXABAY_API_KEY: INVALID
-          CLAUDE_PLUGIN_DATA: ${{ runner.temp }}/pixabay-cache
-        run: |
-          if node pixabay-media/scripts/pixabay.mjs search-images blossom --per-page 3 2>&1 \
-              | grep -q "rejected the API key"; then
-            echo "correctly rejected the bad key"
-          else
-            echo "expected the bad key to be rejected" >&2
-            exit 1
-          fi
+          echo "--- search videos ---"
+          PIXABAY_API_KEY=TESTKEY \
+            node pixabay-media/scripts/pixabay.mjs search-videos flowers --per-page 3 --json \
+            > videos.json
+          grep -q '"duration": 12' videos.json
+
+          echo "--- reject a bad API key ---"
+          set +e
+          PIXABAY_API_KEY=INVALID \
+            node pixabay-media/scripts/pixabay.mjs search-images blossom --per-page 3 \
+            > badkey.txt 2>&1
+          set -e
+          grep -q "rejected the API key" badkey.txt
+          echo "correctly rejected the bad key"
